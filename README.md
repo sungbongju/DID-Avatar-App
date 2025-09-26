@@ -48,66 +48,6 @@ npm install
 npx expo start --tunnel
 ```
 
-#### 6. 앱 실행
-- 서버가 실행되면 터미널에 QR 코드가 나타납니다
-- 개인 스마트폰에 설치된 **Expo Go** 앱을 열고 이 QR 코드를 스캔하면, 앱이 휴대폰에서 실시간으로 실행됩니다
-
----
-
-### 방법 2: 로컬 환경에서 직접 실행
-
-로컬 컴퓨터에 개발 환경을 직접 구축하여 실행할 수도 있습니다.
-
-#### 🔧 사전 준비물
-
-- Node.js (LTS 버전 권장)
-- `npm` 또는 `yarn`
-- 스마트폰에 Expo Go 앱 설치
-
-#### 📋 설치 및 실행
-
-**1. 프로젝트 복제(Clone)**
-
-```bash
-git clone https://github.com/sungbongju/DID-Avatar-App.git
-```
-
-**2. 프로젝트 폴더로 이동**
-
-```bash
-cd DID-Avatar-App/DID_APP
-```
-
-**3. 의존성 패키지 설치**
-
-```bash
-npm install
-```
-
-**4. Expo 서버 실행**
-
-```bash
-npx expo start --tunnel
-```
-
-**5. 앱 실행**
-
-- 터미널에 표시된 QR 코드를 스마트폰의 Expo Go 앱으로 스캔하세요
-- 또는 터미널에서 `a`를 누르면 Android 에뮬레이터에서, `i`를 누르면 iOS 시뮬레이터에서 앱이 실행됩니다
-
-## 🛠️ 기술 스택
-
-| 기술 | 설명 |
-|------|------|
-| **React Native** | 크로스 플랫폼 모바일 앱 개발 프레임워크 |
-| **Expo** | React Native 개발을 위한 오픈 소스 플랫폼 |
-| **TypeScript** | 타입 안전성을 제공하는 JavaScript 슈퍼셋 |
-| **React Native Gesture Handler** | 복잡한 터치 및 제스처를 관리 |
-| **React Native Reanimated** | 부드러운 고성능 애니메이션을 구현 |
-| **React Native WebView** | 앱 내에 웹 콘텐츠를 표시 |
-
----
-
 ## 📱 Expo Go 앱 다운로드
 
 앱을 테스트하려면 스마트폰에 Expo Go 앱이 필요합니다:
@@ -115,17 +55,13 @@ npx expo start --tunnel
 [![Download on the App Store](https://img.shields.io/badge/Download_on_the-App_Store-black?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/expo-go/id982107779)
 [![Get it on Google Play](https://img.shields.io/badge/Get_it_on-Google_Play-green?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=host.exp.exponent)
 
+#### 6. 앱 실행
+- 서버가 실행되면 터미널에 QR 코드가 나타납니다
+- 개인 스마트폰에 설치된 **Expo Go** 앱을 열고 이 QR 코드를 스캔하면, 앱이 휴대폰에서 실시간으로 실행됩니다
+- 
+
+
 ---
-
-## 🤝 기여하기
-
-프로젝트에 기여하고 싶으시다면:
-
-1. 이 저장소를 Fork 해주세요
-2. 새로운 기능을 위한 브랜치를 생성해주세요 (`git checkout -b feature/AmazingFeature`)
-3. 변경사항을 커밋해주세요 (`git commit -m 'Add some AmazingFeature'`)
-4. 브랜치에 푸시해주세요 (`git push origin feature/AmazingFeature`)
-5. Pull Request를 열어주세요
 
 ## 📄 라이선스
 
