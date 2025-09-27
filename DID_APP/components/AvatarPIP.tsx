@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// ✨ 추가: 사용자에게 알림을 띄우기 위한 Alert 임포트
 import { StyleSheet, useWindowDimensions, Text, View, TouchableOpacity, Alert } from 'react-native';
 import { WebView, WebViewPermissionRequest } from 'react-native-webview';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -8,14 +7,12 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-// ✨ 추가: 마이크 권한 요청을 위한 Audio 임포트
 import { Audio } from 'expo-av';
 
 const AvatarPIP = () => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [showWebApp, setShowWebApp] = useState(false);
 
-  // 컴포넌트 크기 및 화면 여백 설정
   const PIP_WIDTH = 180;
   const PIP_HEIGHT = 303;
   const MARGIN = 16;
@@ -57,10 +54,8 @@ const AvatarPIP = () => {
   const start = useSharedValue({ x: 0, y: 0 });
   const isExpanded = useSharedValue(false);
   const isVisible = useSharedValue(true);
-
   const animationConfig = { duration: 350 };
-  
-  // ✨ 추가: 네이티브 마이크 권한을 요청하는 함수
+
   const requestMicrophonePermission = async () => {
     const { status } = await Audio.requestPermissionsAsync();
     return status === 'granted';
@@ -82,22 +77,15 @@ const AvatarPIP = () => {
     isVisible.value = true;
   };
 
-  // ✨ 수정: 아바타를 켜기 전에 권한을 확인하고 요청하는 로직으로 변경
   const toggleWebApp = async () => {
-    // 이미 켜져있다면 그냥 끕니다.
     if (showWebApp) {
       setShowWebApp(false);
       return;
     }
-
-    // 마이크 권한을 요청합니다.
     const hasPermission = await requestMicrophonePermission();
-
-    // 권한이 있다면 웹뷰를 보여줍니다.
     if (hasPermission) {
       setShowWebApp(true);
     } else {
-      // 권한이 없다면 사용자에게 알림을 띄웁니다.
       Alert.alert(
         "마이크 권한 필요",
         "아바타와 대화하려면 마이크 권한을 허용해야 합니다. 설정에서 권한을 변경할 수 있습니다.",
@@ -111,9 +99,11 @@ const AvatarPIP = () => {
     .onEnd(() => {
       'worklet';
       isExpanded.value = !isExpanded.value;
+      
+      const targetHeight = screenHeight * 0.7;
       if (isExpanded.value) {
-        animatedX.value = withTiming(0, animationConfig);
-        animatedY.value = withTiming(screenHeight / 2, animationConfig);
+        animatedX.value = withTiming(MARGIN, animationConfig);
+        animatedY.value = withTiming((screenHeight - targetHeight) / 2, animationConfig);
       } else {
         animatedX.value = withTiming(offsetX.value, animationConfig);
         animatedY.value = withTiming(offsetY.value, animationConfig);
@@ -149,13 +139,11 @@ const AvatarPIP = () => {
   const composedGesture = Gesture.Exclusive(doubleTapGesture, panGesture);
 
   const animatedPipStyle = useAnimatedStyle(() => {
-    const opacity = withTiming(isVisible.value ? 1 : 0, animationConfig);
-    const targetWidth = isExpanded.value ? screenWidth : PIP_WIDTH;
-    const targetHeight = isExpanded.value ? screenHeight / 2 : PIP_HEIGHT;
-    const targetBorderRadius = isExpanded.value ? 0 : 12;
+    const targetWidth = isExpanded.value ? screenWidth - MARGIN * 2 : PIP_WIDTH;
+    const targetHeight = isExpanded.value ? screenHeight * 0.7 : PIP_HEIGHT;
+    const targetBorderRadius = isExpanded.value ? 24 : 12;
 
     return {
-      opacity,
       width: withTiming(targetWidth, animationConfig),
       height: withTiming(targetHeight, animationConfig),
       borderRadius: withTiming(targetBorderRadius, animationConfig),
@@ -163,6 +151,7 @@ const AvatarPIP = () => {
         { translateX: animatedX.value },
         { translateY: animatedY.value },
       ],
+      opacity: withTiming(isVisible.value ? 1 : 0, animationConfig),
       pointerEvents: isVisible.value ? 'auto' : 'none',
     };
   });
@@ -179,9 +168,18 @@ const AvatarPIP = () => {
       pointerEvents: isVisible.value ? 'none' : 'auto',
     };
   });
+  
+  const backdropStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(isExpanded.value ? 0.5 : 0, animationConfig),
+      pointerEvents: isExpanded.value ? 'auto' : 'none',
+    };
+  });
 
   return (
     <>
+      <Animated.View style={[styles.backdrop, backdropStyle]} />
+
       <Animated.View style={[styles.container, animatedPipStyle]}>
         <GestureDetector gesture={composedGesture}>
           {showWebApp ? (
@@ -193,7 +191,7 @@ const AvatarPIP = () => {
               scrollEnabled={true}
               injectedJavaScript={injectedJavaScript}
               onMessage={() => {}}
-              allowsInlineMediaPlayback={true} 
+              allowsInlineMediaPlayback={true}
               mediaCapturePermissionGrantType={'grant'}
               onPermissionRequest={(request: WebViewPermissionRequest) => {
                 request.grant(request.resources);
@@ -218,7 +216,6 @@ const AvatarPIP = () => {
             <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
         </View>
-
       </Animated.View>
 
       <Animated.View style={[styles.reopenButton, reopenButtonStyle]}>
@@ -230,20 +227,23 @@ const AvatarPIP = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'black',
+  },
   container: {
     position: 'absolute',
     backgroundColor: '#2c3e50',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 8,
+    shadowRadius: 8,
+    elevation: 10,
     overflow: 'hidden',
   },
   webviewContainer: {
-     flex: 1,
+    flex: 1,
   },
   webview: {
     flex: 1,
