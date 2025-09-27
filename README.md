@@ -11,11 +11,19 @@ React Native와 Expo를 사용하여 D-ID AI 아바타를 화면 위에 떠 있�
 - **🎛️ PIP 창 제어**: 창 우측 상단의 'X' 버튼으로 PIP 창을 닫을 수 있으며, 닫힌 후 나타나는 재생 버튼(▶)으로 다시 열 수 있습니다
 - **📱 스크롤 호환성**: PIP 창이 커지고 WebView가 활성화된 상태에서도 내부 콘텐츠를 정상적으로 스크롤할 수 있습니다
 
+
 ## 🚀 시작하기
 
 이 프로젝트를 시작하는 가장 쉬운 방법은 GitHub Codespaces를 사용하는 것입니다. 별도의 개발 환경 설정 없이 웹 브라우저에서 바로 프로젝트를 실행할 수 있습니다.
 
-### 방법 1: GitHub Codespaces 사용 (권장)
+## 📱 Expo Go 앱 다운로드
+
+앱을 테스트하려면 스마트폰에 Expo Go 앱이 필요합니다:
+
+[![Download on the App Store](https://img.shields.io/badge/Download_on_the-App_Store-black?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/expo-go/id982107779)
+[![Get it on Google Play](https://img.shields.io/badge/Get_it_on-Google_Play-green?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=host.exp.exponent)
+
+### 방법: GitHub Codespaces 사용
 
 #### 1. 프로젝트 Fork 하기
 이 GitHub 저장소의 우측 상단에 있는 `Fork` 버튼을 클릭하여 자신의 계정으로 프로젝트를 복사해오세요.
@@ -48,17 +56,7 @@ npx expo start --tunnel
 
 최초 실행 시, 터널링에 필요한 @expo/ngrok 패키지를 설치할지 묻는 메시지가 나타날 수 있습니다. 이때 Y를 입력하여 설치를 진행해주세요.
 
-## 📱 Expo Go 앱 다운로드
-
-앱을 테스트하려면 스마트폰에 Expo Go 앱이 필요합니다:
-
-[![Download on the App Store](https://img.shields.io/badge/Download_on_the-App_Store-black?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/expo-go/id982107779)
-[![Get it on Google Play](https://img.shields.io/badge/Get_it_on-Google_Play-green?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=host.exp.exponent)
-
 #### 6. 앱 실행
 - 서버가 실행되면 터미널에 QR 코드가 나타납니다
 - 개인 스마트폰에 설치된 **Expo Go** 앱을 열고 이 QR 코드를 스캔하면, 앱이 휴대폰에서 실시간으로 실행됩니다
-- 
-
-
 ---
