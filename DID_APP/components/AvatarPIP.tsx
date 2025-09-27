@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { StyleSheet, useWindowDimensions, Text, View, TouchableOpacity } from 'react-native';
-import { WebView } from 'react-native-webview';
+// ✨ 추가: 사용자에게 알림을 띄우기 위한 Alert 임포트
+import { StyleSheet, useWindowDimensions, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { WebView, WebViewPermissionRequest } from 'react-native-webview';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  runOnJS,
 } from 'react-native-reanimated';
+// ✨ 추가: 마이크 권한 요청을 위한 Audio 임포트
+import { Audio } from 'expo-av';
 
 const AvatarPIP = () => {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -20,10 +22,8 @@ const AvatarPIP = () => {
   const SAFE_AREA_TOP = 40;
   const ESTIMATED_TAB_BAR_HEIGHT = 30;
 
-  // ✨ 수정된 부분: 다시 Streamlit URL을 사용합니다.
   const STREAMLIT_URL = 'https://d-id-agents-dc48mx8mz3qfgguvlubpsr.streamlit.app/';
 
-  // ✨ 추가된 부분: Streamlit UI를 숨기기 위해 주입할 JavaScript 코드
   const injectedJavaScript = `
     const style = document.createElement('style');
     style.innerHTML = \`
@@ -59,6 +59,12 @@ const AvatarPIP = () => {
   const isVisible = useSharedValue(true);
 
   const animationConfig = { duration: 350 };
+  
+  // ✨ 추가: 네이티브 마이크 권한을 요청하는 함수
+  const requestMicrophonePermission = async () => {
+    const { status } = await Audio.requestPermissionsAsync();
+    return status === 'granted';
+  };
 
   const closePip = () => {
     setShowWebApp(false);
@@ -72,26 +78,46 @@ const AvatarPIP = () => {
     offsetY.value = initialY;
     animatedX.value = initialX;
     animatedY.value = initialY;
-    isExpanded.value = false; 
+    isExpanded.value = false;
     isVisible.value = true;
   };
-  
-  const toggleWebApp = () => {
-      setShowWebApp(current => !current);
+
+  // ✨ 수정: 아바타를 켜기 전에 권한을 확인하고 요청하는 로직으로 변경
+  const toggleWebApp = async () => {
+    // 이미 켜져있다면 그냥 끕니다.
+    if (showWebApp) {
+      setShowWebApp(false);
+      return;
+    }
+
+    // 마이크 권한을 요청합니다.
+    const hasPermission = await requestMicrophonePermission();
+
+    // 권한이 있다면 웹뷰를 보여줍니다.
+    if (hasPermission) {
+      setShowWebApp(true);
+    } else {
+      // 권한이 없다면 사용자에게 알림을 띄웁니다.
+      Alert.alert(
+        "마이크 권한 필요",
+        "아바타와 대화하려면 마이크 권한을 허용해야 합니다. 설정에서 권한을 변경할 수 있습니다.",
+        [{ text: "확인" }]
+      );
+    }
   };
 
   const doubleTapGesture = Gesture.Tap()
     .numberOfTaps(2)
     .onEnd(() => {
-        'worklet';
-        isExpanded.value = !isExpanded.value;
-        if (isExpanded.value) {
-            animatedX.value = withTiming(0, animationConfig);
-            animatedY.value = withTiming(screenHeight / 2, animationConfig);
-        } else {
-            animatedX.value = withTiming(offsetX.value, animationConfig);
-            animatedY.value = withTiming(offsetY.value, animationConfig);
-        }
+      'worklet';
+      isExpanded.value = !isExpanded.value;
+      if (isExpanded.value) {
+        animatedX.value = withTiming(0, animationConfig);
+        animatedY.value = withTiming(screenHeight / 2, animationConfig);
+      } else {
+        animatedX.value = withTiming(offsetX.value, animationConfig);
+        animatedY.value = withTiming(offsetY.value, animationConfig);
+      }
     });
 
   const panGesture = Gesture.Pan()
@@ -140,9 +166,9 @@ const AvatarPIP = () => {
       pointerEvents: isVisible.value ? 'auto' : 'none',
     };
   });
-  
+
   const webAppButtonStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(isExpanded.value ? 0 : 1, {duration: 150}),
+    opacity: withTiming(isExpanded.value ? 0 : 1, { duration: 150 }),
     pointerEvents: isExpanded.value ? 'none' : 'auto',
   }));
 
@@ -158,35 +184,39 @@ const AvatarPIP = () => {
     <>
       <Animated.View style={[styles.container, animatedPipStyle]}>
         <GestureDetector gesture={composedGesture}>
-            {showWebApp ? (
-              <WebView
-                // ✨ 수정된 부분: 다시 URL을 소스로 사용하고, JS를 주입합니다.
-                source={{ uri: STREAMLIT_URL }}
-                style={styles.webview}
-                containerStyle={styles.webviewContainer}
-                backgroundColor="transparent"
-                scrollEnabled={true}
-                injectedJavaScript={injectedJavaScript}
-                onMessage={() => {}} // injectedJavaScript를 위해 필요한 속성
-              />
-            ) : (
-              <View style={styles.placeholderContainer}>
-                <Text style={styles.placeholderText}>PIP Mode</Text>
-                <Text style={styles.instructionText}>🌐 버튼으로 아바타 연결</Text>
-              </View>
-            )}
+          {showWebApp ? (
+            <WebView
+              source={{ uri: STREAMLIT_URL }}
+              style={styles.webview}
+              containerStyle={styles.webviewContainer}
+              backgroundColor="transparent"
+              scrollEnabled={true}
+              injectedJavaScript={injectedJavaScript}
+              onMessage={() => {}}
+              allowsInlineMediaPlayback={true} 
+              mediaCapturePermissionGrantType={'grant'}
+              onPermissionRequest={(request: WebViewPermissionRequest) => {
+                request.grant(request.resources);
+              }}
+            />
+          ) : (
+            <View style={styles.placeholderContainer}>
+              <Text style={styles.placeholderText}>PIP Mode</Text>
+              <Text style={styles.instructionText}>🌐 버튼으로 아바타 연결</Text>
+            </View>
+          )}
         </GestureDetector>
 
         <Animated.View style={[styles.webAppButton, webAppButtonStyle]}>
-            <TouchableOpacity onPress={toggleWebApp} style={styles.touchableArea}>
-              <Text style={styles.webAppButtonText}>🌐</Text>
-            </TouchableOpacity>
+          <TouchableOpacity onPress={toggleWebApp} style={styles.touchableArea}>
+            <Text style={styles.webAppButtonText}>🌐</Text>
+          </TouchableOpacity>
         </Animated.View>
 
         <View style={styles.closeButton}>
-            <TouchableOpacity onPress={closePip} style={styles.touchableArea}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
+          <TouchableOpacity onPress={closePip} style={styles.touchableArea}>
+            <Text style={styles.closeButtonText}>✕</Text>
+          </TouchableOpacity>
         </View>
 
       </Animated.View>
@@ -200,6 +230,7 @@ const AvatarPIP = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
@@ -212,7 +243,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   webviewContainer: {
-      flex: 1,
+     flex: 1,
   },
   webview: {
     flex: 1,
@@ -300,4 +331,3 @@ const styles = StyleSheet.create({
 });
 
 export default AvatarPIP;
-
