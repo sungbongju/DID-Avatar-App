@@ -1,8 +1,6 @@
 # 🤖 D-ID AI Avatar PIP App
 
-React Native와 Expo를 사용하여 D-ID AI 아바타를 화면 위에 떠 있는 PIP(Picture-in-Picture) 창 형태로 구현한 모바일 애플리케이션입니다. 사용자는 이 PIP 창을 자유롭게 드래그하거나 크기를 조절할 수 있으며, 내장된 WebView를 통해 실시간으로 AI 아바타와 상호작용할 수 있습니다.
-
-> *이곳에 앱 실행 화면 스크린샷이나 GIF를 추가하면 좋습니다.*
+React Native와 Expo를 사용하여 D-ID AI 아바타를 화면 위에 떠 있는 PIP(Picture-in-Picture) 창 형태로 구현한 모바일 애플리케이션입니다. 사용자는 이 PIP 창의 크기를 조절할 수 있으며, 내장된 WebView를 통해 실시간으로 AI 아바타와 상호작용할 수 있습니다.
 
 ## ✨ 주요 기능
 
